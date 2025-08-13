@@ -29,7 +29,17 @@ A blazing fast, minimalist, and privacy-first web tool to instantly generate sec
 
 ---
 
-## 🚀 Quick Start
+## �️ Roadmap
+
+See the project plan and phases in [ROADMAP.md](./ROADMAP.md).
+
+Highlights:
+- Phase 1: Foundation for multiple templates (Template Registry, shared UI, routes)
+- Phase 2: Supabase .env import (drag & drop + GitHub URL)
+
+---
+
+## �🚀 Quick Start
 
 ```sh
 pnpm install
@@ -127,7 +137,7 @@ Contributions are welcome! Please open an issue or submit a pull request.
 
 ---
 
-## � Documentation
+## 📚 Documentation
 
 - [docs/1-goals-and-background-context.md](docs/1-goals-and-background-context.md)
 - [docs/2-requirements.md](docs/2-requirements.md)
@@ -136,6 +146,8 @@ Contributions are welcome! Please open an issue or submit a pull request.
 - [docs/5-epic-list.md](docs/5-epic-list.md)
 - [docs/6-tests.md](docs/6-tests.md)
 - [docs/7-secret-specification-table.md](docs/7-secret-specification-table.md)
+- [docs/8-supabase-env-import.md](docs/8-supabase-env-import.md)
+- [docs/9-template-architecture-and-roadmap.md](docs/9-template-architecture-and-roadmap.md)
 
 ---
 

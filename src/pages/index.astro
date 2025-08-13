@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import Header from "../components/shared/Header.astro";
 
 // SEO metadata
 export const prerender = true;
@@ -30,6 +31,7 @@ export const prerender = true;
 		<title>Generate Secrets - Instant Secure Credential Generator</title>
 	</head>
 	<body class="min-h-screen bg-base-200">
+		<Header currentPage="home" />
 		<main class="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-screen">
 			<div class="w-full max-w-2xl bg-base-100 rounded-box shadow-xl p-6 md:p-8">
 				<!-- Header -->

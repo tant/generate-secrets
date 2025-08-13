@@ -1,0 +1,28 @@
+---
+// ParsedList.astro: Render parsed key-value list
+import type { TemplateMeta } from "../../templates/registry";
+import type { EnvNode } from "../../utils/envParser";
+const { template, parsed = [] } = Astro.props as { template: TemplateMeta; parsed?: EnvNode[] };
+
+---
+<div class="card bg-base-100 shadow-md p-4 mb-4">
+  <div class="mb-2 font-semibold">Parsed keys</div>
+  <div class="space-y-2">
+    {parsed.length === 0 && <div class="text-sm opacity-60">No .env file imported yet.</div>}
+    {parsed.map((node, i) => {
+      if (node.type !== 'pair') return null;
+      return (
+        <div class="flex items-center gap-2" key={i}>
+          <span class="font-mono">{node.key}</span>
+          {node.duplicate && <span class="badge badge-warning">duplicate</span>}
+          <span class="font-mono">{template.knownKeys?.find(k => k.key === node.key)?.mask ? '••••••••••••••••' : node.value}</span>
+          {node.inlineComment && <span class="badge badge-ghost">#{node.inlineComment}</span>}
+          <button class="btn btn-xs btn-ghost" title="Show/Hide" aria-label="Show or hide value">👁️</button>
+          <button class="btn btn-xs btn-ghost" title="Info" aria-label="Info">?</button>
+          <button class="btn btn-xs btn-ghost" title="Copy" aria-label="Copy value">Copy</button>
+          <button class="btn btn-xs btn-ghost" title="Re-roll" aria-label="Re-roll secret">Re-roll</button>
+        </div>
+      );
+    })}
+  </div>
+</div>

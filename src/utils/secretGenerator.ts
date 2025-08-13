@@ -11,7 +11,19 @@ const ALPHANUMERIC_LOWER = LOWERCASE + NUMBERS;
 const ALPHANUMERIC_ONLY = LOWERCASE + UPPERCASE + NUMBERS;
 
 /**
+ * Generates cryptographically secure random bytes
+ * @param length - Number of bytes to generate
+ * @returns Uint8Array of random bytes
+ */
+function generateRandomBytes(length: number): Uint8Array {
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return array;
+}
+
+/**
  * Generates a random string of specified length using given character set
+ * Uses cryptographically secure random number generation
  * @param length - Length of the string to generate
  * @param charset - Character set to use for generation
  * @returns Random string
@@ -19,9 +31,13 @@ const ALPHANUMERIC_ONLY = LOWERCASE + UPPERCASE + NUMBERS;
 function generateRandomString(length: number, charset: string): string {
   let result = "";
   const charsetLength = charset.length;
+  
+  // Use cryptographically secure random bytes
+  const randomBytes = generateRandomBytes(length);
 
   for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charsetLength);
+    // Use modulo to map byte values to charset indices
+    const randomIndex = randomBytes[i] % charsetLength;
     result += charset[randomIndex];
   }
 
@@ -33,7 +49,9 @@ function generateRandomString(length: number, charset: string): string {
  * @returns Random username
  */
 export function generateUsername(): string {
-  const length = Math.floor(Math.random() * 5) + 8; // 8-12 characters
+  // Use cryptographically secure random for length selection
+  const randomByte = generateRandomBytes(1)[0];
+  const length = (randomByte % 5) + 8; // 8-12 characters
   return generateRandomString(length, ALPHANUMERIC_ONLY);
 }
 
@@ -55,11 +73,15 @@ export function generatePassword(): string {
   // Fill the rest randomly
   password += generateRandomString(length - 4, allChars);
 
-  // Shuffle the password to avoid predictable patterns
-  return password
-    .split("")
-    .sort(() => Math.random() - 0.5)
-    .join("");
+  // Shuffle the password using cryptographically secure random
+  const passwordArray = password.split("");
+  for (let i = passwordArray.length - 1; i > 0; i--) {
+    const randomByte = generateRandomBytes(1)[0];
+    const j = randomByte % (i + 1);
+    [passwordArray[i], passwordArray[j]] = [passwordArray[j], passwordArray[i]];
+  }
+  
+  return passwordArray.join("");
 }
 
 /**
@@ -100,10 +122,7 @@ export function generateJwtSecretHex(): string {
  */
 export function generateJwtSecretBase64(): string {
   // Generate 32 random bytes and encode as base64
-  const array = new Uint8Array(32);
-  for (let i = 0; i < 32; i++) {
-    array[i] = Math.floor(Math.random() * 256);
-  }
+  const array = generateRandomBytes(32);
   return btoa(String.fromCharCode(...array));
 }
 
@@ -113,10 +132,7 @@ export function generateJwtSecretBase64(): string {
  */
 export function generateAnonKey(): string {
   // Generate a longer base64 string similar to a JWT
-  const array = new Uint8Array(48); // 48 bytes = 64 base64 chars
-  for (let i = 0; i < 48; i++) {
-    array[i] = Math.floor(Math.random() * 256);
-  }
+  const array = generateRandomBytes(48); // 48 bytes = 64 base64 chars
   return btoa(String.fromCharCode(...array));
 }
 
@@ -134,10 +150,7 @@ export function generateSecretKeyBase(): string {
  */
 export function generateServiceRoleKey(): string {
   // Generate a longer base64 string similar to a JWT
-  const array = new Uint8Array(48); // 48 bytes = 64 base64 chars
-  for (let i = 0; i < 48; i++) {
-    array[i] = Math.floor(Math.random() * 256);
-  }
+  const array = generateRandomBytes(48); // 48 bytes = 64 base64 chars
   return btoa(String.fromCharCode(...array));
 }
 

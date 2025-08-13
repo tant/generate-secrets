@@ -13,6 +13,24 @@ import {
   generateUsername,
 } from "../secretGenerator";
 
+// Mock the crypto API for testing
+const mockRandomValues = (array: Uint8Array) => {
+  // Fill with predictable values for testing
+  for (let i = 0; i < array.length; i++) {
+    array[i] = i % 256;
+  }
+  return array;
+};
+
+beforeEach(() => {
+  // Mock crypto.getRandomValues
+  Object.defineProperty(globalThis, 'crypto', {
+    value: {
+      getRandomValues: mockRandomValues,
+    },
+  });
+});
+
 describe("Secret Generator Functions", () => {
   test("generateUsername should create a readable string between 8-12 characters", () => {
     const username = generateUsername();
@@ -121,5 +139,18 @@ describe("Secret Generator Functions", () => {
       expect(typeof value).toBe("string");
       expect(value.length).toBeGreaterThan(0);
     });
+  });
+
+  test("should use crypto.getRandomValues for randomness", () => {
+    // Spy on crypto.getRandomValues
+    const spy = vi.spyOn(globalThis.crypto, 'getRandomValues');
+    
+    // Generate a secret
+    generateUsername();
+    
+    // Check that crypto.getRandomValues was called
+    expect(spy).toHaveBeenCalled();
+    
+    spy.mockRestore();
   });
 });
