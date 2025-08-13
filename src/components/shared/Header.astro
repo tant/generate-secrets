@@ -1,0 +1,40 @@
+---
+// Header.astro: Navigation header for the app
+const { currentPage = "home" } = Astro.props as { currentPage?: "home" | "templates" | "privacy" };
+---
+
+<header class="navbar bg-base-100 shadow-md mb-6">
+  <div class="flex-1">
+    <a href="/" class="btn btn-ghost text-xl">Generate Secrets</a>
+  </div>
+  <div class="flex-none">
+    <ul class="menu menu-horizontal px-1">
+      <li>
+        <a 
+          href="/" 
+          class={`btn btn-ghost btn-sm ${currentPage === "home" ? "btn-active" : ""}`}
+          aria-current={currentPage === "home" ? "page" : undefined}
+        >
+          Home
+        </a>
+      </li>
+      <li>
+        <a 
+          href="/templates/supabase" 
+          class={`btn btn-ghost btn-sm ${currentPage === "templates" ? "btn-active" : ""}`}
+          aria-current={currentPage === "templates" ? "page" : undefined}
+        >
+          Templates
+        </a>
+      </li>
+      <li>
+        <a 
+          href="/privacy-policy" 
+          class={`btn btn-ghost btn-sm ${currentPage === "privacy" ? "btn-active" : ""}`}
+        >
+          Privacy
+        </a>
+      </li>
+    </ul>
+  </div>
+</header>

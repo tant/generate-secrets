@@ -1,0 +1,105 @@
+---
+// ImportPanel.astro: Dropzone + GitHub URL input, parses file and updates parent state
+import type { TemplateMeta } from "../../templates/registry";
+const { template, onImport } = Astro.props as { template: TemplateMeta; onImport: (content: string) => void };
+
+const messages = {
+  importTitle: "Import .env file",
+  dropOr: "Drop your .env.example here or",
+  chooseFile: "Choose file",
+  githubLabel: "Or import from GitHub URL:",
+  githubPlaceholder: "https://github.com/owner/repo/blob/branch/path/.env.example",
+  githubOnly: "GitHub only; blob URLs will be normalized to raw.",
+  privacy: "All processing is done in your browser. No data is uploaded.",
+  errorFile: "Failed to read file.",
+  errorSize: "File is too large (max 256 KB).",
+  errorUrl: "Only GitHub blob/raw URLs are supported.",
+  errorFetch: "Failed to fetch file from GitHub.",
+};
+
+---
+<div class="card bg-base-100 shadow-md p-4 mb-4">
+  <div class="mb-2 font-semibold">{messages.importTitle}</div>
+  <div class="border-2 border-dashed border-primary rounded-lg p-4 text-center cursor-pointer mb-2" id="dropzone">
+    <span>{messages.dropOr}</span>
+    <input type="file" id="fileInput" accept=".env,.txt,.example" class="hidden" />
+  <button class="btn btn-sm btn-primary ml-2" id="chooseFileBtn" aria-label="Choose file">{messages.chooseFile}</button>
+  </div>
+  {template?.uiOptions?.showUrlInput && (
+    <div class="flex flex-col gap-2 mt-2">
+      <label class="label text-xs">{messages.githubLabel}</label>
+      <div class="flex gap-2">
+        <input class="input input-bordered flex-1" id="githubUrlInput" placeholder={messages.githubPlaceholder} />
+  <button class="btn btn-primary btn-sm" id="importUrlBtn" aria-label="Import from GitHub URL">Import</button>
+      </div>
+      <span class="text-xs opacity-60">{messages.githubOnly}</span>
+    </div>
+  )}
+  <div class="text-xs mt-2 opacity-60">{messages.privacy}</div>
+
+  <script type="module" client:load>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const chooseFileBtn = document.getElementById('chooseFileBtn');
+    const githubUrlInput = document.getElementById('githubUrlInput');
+    const importUrlBtn = document.getElementById('importUrlBtn');
+    const MAX_SIZE = 256 * 1024;
+
+    function handleFile(file) {
+      if (file.size > MAX_SIZE) {
+        window.dispatchEvent(new CustomEvent('env-import-error', { detail: { message: messages.errorSize } }));
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        window.dispatchEvent(new CustomEvent('env-import', { detail: { content: e.target.result } }));
+      };
+      reader.onerror = () => {
+        window.dispatchEvent(new CustomEvent('env-import-error', { detail: { message: messages.errorFile } }));
+      };
+      reader.readAsText(file);
+    }
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    chooseFileBtn.addEventListener('click', (e) => { e.preventDefault(); fileInput.click(); });
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleFile(file);
+    });
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('bg-base-200'); });
+    dropzone.addEventListener('dragleave', (e) => { e.preventDefault(); dropzone.classList.remove('bg-base-200'); });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('bg-base-200');
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+
+    if (importUrlBtn) {
+      importUrlBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const url = githubUrlInput.value.trim();
+        if (!/^https:\/\/(github.com|raw.githubusercontent.com)\//.test(url)) {
+          window.dispatchEvent(new CustomEvent('env-import-error', { detail: { message: messages.errorUrl } }));
+          return;
+        }
+        let rawUrl = url;
+        if (/github.com\/.+\/blob\//.test(url)) {
+          rawUrl = url.replace(/^https:\/\/github.com\/(.+?)\/(.+?)\/blob\/(.+?)\/(.+)$/, 'https://raw.githubusercontent.com/$1/$2/$3/$4');
+        }
+        try {
+          const resp = await fetch(rawUrl);
+          if (!resp.ok) throw new Error('Fetch failed');
+          const text = await resp.text();
+          if (text.length > MAX_SIZE) {
+            window.dispatchEvent(new CustomEvent('env-import-error', { detail: { message: messages.errorSize } }));
+            return;
+          }
+          window.dispatchEvent(new CustomEvent('env-import', { detail: { content: text } }));
+        } catch {
+          window.dispatchEvent(new CustomEvent('env-import-error', { detail: { message: messages.errorFetch } }));
+        }
+      });
+    }
+  </script>
+</div>

@@ -1,0 +1,43 @@
+---
+// SummaryControls.astro: Shows counts and toggles based on parsed data
+import type { TemplateMeta } from "../../templates/registry";
+import type { EnvNode } from "../../utils/envParser";
+const { template, parsed = [] } = Astro.props as { template: TemplateMeta; parsed?: EnvNode[] };
+
+const keyCount = parsed.filter(n => n.type === 'pair').length;
+const duplicateCount = parsed.filter(n => n.type === 'pair' && n.duplicate).length;
+
+// Calculate secret count based on known keys in the template
+const secretCount = parsed.filter(node => {
+  if (node.type !== 'pair') return false;
+  return template.knownKeys?.some(key => key.key === node.key) || false;
+}).length;
+
+---
+<div class="card bg-base-100 shadow-md p-4 mb-4">
+  <div class="flex gap-2 mb-2">
+    <span class="badge badge-info">{keyCount} keys</span>
+    <span class="badge badge-success">{secretCount} secrets</span>
+    {duplicateCount > 0 && (
+      <span class="badge badge-warning">{duplicateCount} duplicates</span>
+    )}
+  </div>
+  <div class="flex gap-4 items-center mb-2">
+    {template?.uiOptions?.showPreserveToggle && (
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="toggle toggle-sm" checked />
+        <span class="text-sm">Preserve existing non-empty values</span>
+      </label>
+    )}
+    {template?.uiOptions?.showJwtTtlControl && (
+      <select class="select select-sm">
+        <option>5y</option>
+        <option>3y</option>
+        <option>1y</option>
+        <option>Custom</option>
+      </select>
+    )}
+  <button class="btn btn-primary btn-sm" aria-label="Generate secrets">Generate secrets</button>
+  <button class="btn btn-ghost btn-sm" aria-label="Reset to original">Reset to original</button>
+  </div>
+</div>

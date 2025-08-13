@@ -1,0 +1,22 @@
+---
+import { getTemplateById, templates } from "../../templates/registry";
+import TemplatePage from "../../components/client/TemplatePage.jsx";
+import Header from "../../components/shared/Header.astro";
+
+export function getStaticPaths() {
+  // Generate a static path for each template id in the registry
+  return Object.keys(templates).map((id) => ({ params: { id } }));
+}
+
+const { params } = Astro;
+const template = getTemplateById(params.id);
+---
+<Header currentPage="templates" />
+{!template ? (
+  <div class="prose mx-auto my-12">
+    <h1>Template not found</h1>
+    <p>Sorry, the requested template does not exist.</p>
+  </div>
+) : (
+  <TemplatePage template={template} client:load />
+)}
