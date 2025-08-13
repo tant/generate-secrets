@@ -107,7 +107,7 @@ export const prerender = true;
 			const ALPHANUMERIC_ONLY = LOWERCASE + UPPERCASE + NUMBERS;
 			
 			// Utility functions for generating random strings
-			function generateRandomString(length, charset) {
+			   function generateRandomString(length: number, charset: string): string {
 				let result = '';
 				const charsetLength = charset.length;
 				
@@ -206,12 +206,12 @@ export const prerender = true;
 			}
 			
 			// Function to render secrets in the UI with tooltips
-			function renderSecrets(secrets) {
+			   function renderSecrets(secrets: Record<string, string>): void {
 				const container = document.getElementById('secrets-container');
 				let html = '<div class="space-y-3">';
 				
 				for (const [label, value] of Object.entries(secrets)) {
-					const explanation = SECRET_EXPLANATIONS[label] || 'No explanation available.';
+					   const explanation = (SECRET_EXPLANATIONS as Record<string, string>)[label] || 'No explanation available.';
 					const safeLabel = label.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
 					
 					html += `
@@ -240,82 +240,84 @@ export const prerender = true;
 				}
 				
 				html += '</div>';
-				container.innerHTML = html;
+				   if (container) {
+					   container.innerHTML = html;
+				   }
 				
 				// Add event listeners for tooltips
 				setupTooltipListeners();
 			}
 			
 			// Function to set up tooltip event listeners
-			function setupTooltipListeners() {
-				const tooltipTriggers = document.querySelectorAll('.tooltip-trigger');
-				
-				tooltipTriggers.forEach(trigger => {
-					const label = trigger.getAttribute('data-label');
-					const tooltip = document.getElementById(`tooltip-${label}`);
-					
-					// Show tooltip on click
-					trigger.addEventListener('click', (e) => {
-						e.stopPropagation();
-						// Hide all other tooltips first
-						hideAllTooltips();
-						// Show this tooltip
-						showTooltip(tooltip);
-					});
-					
-					// Hide tooltip when pressing Escape
-					trigger.addEventListener('keydown', (e) => {
-						if (e.key === 'Escape') {
-							hideTooltip(tooltip);
-							trigger.blur();
-						}
-					});
-				});
-				
-				// Hide tooltips when clicking outside
-				document.addEventListener('click', (e) => {
-					if (!e.target.closest('.tooltip-trigger') && !e.target.closest('.tooltip-content')) {
-						hideAllTooltips();
-					}
-				});
-			}
+			   function setupTooltipListeners() {
+				   const tooltipTriggers = document.querySelectorAll('.tooltip-trigger');
+               
+				   tooltipTriggers.forEach(trigger => {
+					   const label = trigger.getAttribute('data-label');
+					   const tooltip = document.getElementById(`tooltip-${label}`);
+                   
+					   // Show tooltip on click
+					   trigger.addEventListener('click', (e: Event) => {
+						   e.stopPropagation();
+						   // Hide all other tooltips first
+						   hideAllTooltips();
+						   // Show this tooltip
+						   showTooltip(tooltip);
+					   });
+                   
+					   // Hide tooltip when pressing Escape
+					   (trigger as HTMLElement).addEventListener('keydown', (e: KeyboardEvent) => {
+						   if (e.key === 'Escape') {
+							   hideTooltip(tooltip);
+							   (trigger as HTMLElement).blur();
+						   }
+					   });
+				   });
+               
+				   // Hide tooltips when clicking outside
+				   document.addEventListener('click', (e: MouseEvent) => {
+					   const target = e.target as HTMLElement | null;
+					   if (target && !target.closest('.tooltip-trigger') && !target.closest('.tooltip-content')) {
+						   hideAllTooltips();
+					   }
+				   });
+			   }
 			
 			// Tooltip helper functions
-			function showTooltip(tooltip) {
-				if (tooltip) {
-					tooltip.classList.remove('hidden');
-				}
-			}
-			
-			function hideTooltip(tooltip) {
-				if (tooltip) {
-					tooltip.classList.add('hidden');
-				}
-			}
-			
-			function hideAllTooltips() {
-				const tooltips = document.querySelectorAll('.tooltip-content');
-				tooltips.forEach(tooltip => tooltip.classList.add('hidden'));
-			}
+			   function showTooltip(tooltip: HTMLElement | null): void {
+				   if (tooltip) {
+					   tooltip.classList.remove('hidden');
+				   }
+			   }
+           
+			   function hideTooltip(tooltip: HTMLElement | null): void {
+				   if (tooltip) {
+					   tooltip.classList.add('hidden');
+				   }
+			   }
+           
+			   function hideAllTooltips(): void {
+				   const tooltips = document.querySelectorAll<HTMLElement>('.tooltip-content');
+				   tooltips.forEach(tooltip => tooltip.classList.add('hidden'));
+			   }
 			
 			// Function to show error messages
-			function showError(message) {
-				const errorElement = document.getElementById('error-message');
-				const errorText = document.getElementById('error-text');
-				if (errorText) {
-					errorText.textContent = message;
-				}
-				if (errorElement) {
-					errorElement.classList.remove('hidden');
-					
-					// Hide error after 5 seconds
-					setTimeout(() => {
-						if (errorElement) {
-							errorElement.classList.add('hidden');
-						}
-					}, 5000);
-				}
-			}
+			   function showError(message: string): void {
+				   const errorElement = document.getElementById('error-message');
+				   const errorText = document.getElementById('error-text');
+				   if (errorText) {
+					   errorText.textContent = message;
+				   }
+				   if (errorElement) {
+					   errorElement.classList.remove('hidden');
+					   // Hide error after 5 seconds
+					   setTimeout(() => {
+						   if (errorElement) {
+							   errorElement.classList.add('hidden');
+						   }
+					   }, 5000);
+				   }
+			   }
 			
 			// Function to show copy confirmation
 			function showCopyConfirmation() {
@@ -333,83 +335,98 @@ export const prerender = true;
 			}
 			
 			// Generate secrets when button is clicked
-			document.getElementById('generate-btn').addEventListener('click', () => {
-				try {
-					// Hide any previous error messages
-					const errorMessage = document.getElementById('error-message');
-					if (errorMessage) {
-						errorMessage.classList.add('hidden');
-					}
-					
-					// Generate all secrets
-					const secrets = generateAllSecrets();
-					
-					// Render secrets in the UI
-					renderSecrets(secrets);
-				} catch (error) {
-					showError('Failed to generate secrets: ' + error.message);
-				}
-			});
+			   const generateBtn = document.getElementById('generate-btn');
+			   if (generateBtn) {
+				   generateBtn.addEventListener('click', () => {
+					   try {
+						   // Hide any previous error messages
+						   const errorMessage = document.getElementById('error-message');
+						   if (errorMessage) {
+							   errorMessage.classList.add('hidden');
+						   }
+						   // Generate all secrets
+						   const secrets = generateAllSecrets();
+						   // Render secrets in the UI
+						   renderSecrets(secrets);
+					   } catch (error) {
+						   if (error instanceof Error) {
+							   showError('Failed to generate secrets: ' + error.message);
+						   } else {
+							   showError('Failed to generate secrets: Unknown error');
+						   }
+					   }
+				   });
+			   }
 			
 			// Copy secrets to clipboard when button is clicked
-			document.getElementById('copy-btn').addEventListener('click', () => {
-				try {
-					// Hide any previous error messages
-					const errorMessage = document.getElementById('error-message');
-					if (errorMessage) {
-						errorMessage.classList.add('hidden');
-					}
-					
-					// Get all secret elements
-					const secretElements = document.querySelectorAll('#secrets-container .flex');
-					if (secretElements.length === 0) {
-						showError('No secrets to copy. Please generate secrets first.');
-						return;
-					}
-					
-					// Format secrets for .env file
-					let envContent = '';
-					secretElements.forEach(element => {
-						const labelElement = element.querySelector('span.font-medium');
-						const valueElement = element.querySelector('span.font-mono');
-						if (labelElement && valueElement) {
-							const label = labelElement.textContent.replace(':', '');
-							const value = valueElement.textContent;
-							envContent += `${label}=${value}\n`;
-						}
-					});
-					
-					// Copy to clipboard
-					navigator.clipboard.writeText(envContent)
-						.then(() => {
-							showCopyConfirmation();
-						})
-						.catch(err => {
-							// Fallback for browsers that don't support clipboard API
-							try {
-								const textArea = document.createElement('textarea');
-								textArea.value = envContent;
-								textArea.style.position = 'fixed';
-								textArea.style.left = '-999999px';
-								textArea.style.top = '-999999px';
-								document.body.appendChild(textArea);
-								textArea.focus();
-								textArea.select();
-								const successful = document.execCommand('copy');
-								document.body.removeChild(textArea);
-								if (successful) {
-									showCopyConfirmation();
-								} else {
-									showError('Failed to copy to clipboard using fallback method');
-								}
-							} catch (fallbackError) {
-								showError('Failed to copy to clipboard: ' + (err.message || fallbackError.message));
-							}
-						});
-				} catch (error) {
-					showError('Failed to copy secrets: ' + error.message);
-				}
-			});
+			   const copyBtn = document.getElementById('copy-btn');
+			   if (copyBtn) {
+				   copyBtn.addEventListener('click', () => {
+					   try {
+						   // Hide any previous error messages
+						   const errorMessage = document.getElementById('error-message');
+						   if (errorMessage) {
+							   errorMessage.classList.add('hidden');
+						   }
+						   // Get all secret elements
+						   const secretElements = document.querySelectorAll('#secrets-container .flex');
+						   if (secretElements.length === 0) {
+							   showError('No secrets to copy. Please generate secrets first.');
+							   return;
+						   }
+						   // Format secrets for .env file
+						   let envContent = '';
+						   secretElements.forEach(element => {
+							   const labelElement = element.querySelector('span.font-medium');
+							   const valueElement = element.querySelector('span.font-mono');
+							   if (labelElement && valueElement) {
+								   const label = labelElement.textContent?.replace(':', '');
+								   const value = valueElement.textContent;
+								   envContent += `${label}=${value}\n`;
+							   }
+						   });
+						   // Copy to clipboard
+						   navigator.clipboard.writeText(envContent)
+							   .then(() => {
+								   showCopyConfirmation();
+							   })
+							   .catch((err: unknown) => {
+								   // Fallback for browsers that don't support clipboard API
+								   try {
+									   const textArea = document.createElement('textarea');
+									   textArea.value = envContent;
+									   textArea.style.position = 'fixed';
+									   textArea.style.left = '-999999px';
+									   textArea.style.top = '-999999px';
+									   document.body.appendChild(textArea);
+									   textArea.focus();
+									   textArea.select();
+									   const successful = document.execCommand('copy');
+									   document.body.removeChild(textArea);
+									   if (successful) {
+										   showCopyConfirmation();
+									   } else {
+										   showError('Failed to copy to clipboard using fallback method');
+									   }
+								   } catch (fallbackError: unknown) {
+									   let errMsg = 'Failed to copy to clipboard.';
+									   if (typeof err === 'object' && err && 'message' in err) {
+										   errMsg = 'Failed to copy to clipboard: ' + (err as { message?: string }).message;
+									   } else if (typeof fallbackError === 'object' && fallbackError && 'message' in fallbackError) {
+										   errMsg = 'Failed to copy to clipboard: ' + (fallbackError as { message?: string }).message;
+									   }
+									   showError(errMsg);
+								   }
+							   });
+					   } catch (error: unknown) {
+						   if (typeof error === 'object' && error && 'message' in error) {
+							   showError('Failed to copy secrets: ' + (error as { message?: string }).message);
+						   } else {
+							   showError('Failed to copy secrets: Unknown error');
+						   }
+					   }
+				   });
+			   }
 		</script>
 	</body>
 </html>
