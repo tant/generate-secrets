@@ -92,6 +92,20 @@ export const prerender = true;
 			const ALPHANUMERIC_LOWER = LOWERCASE + NUMBERS;
 			const ALPHANUMERIC_ONLY = LOWERCASE + UPPERCASE + NUMBERS;
 			
+			// Tooltip explanations for each secret type
+			const SECRET_EXPLANATIONS = {
+				'username': 'Random, readable string, 8-12 characters, no special characters.',
+				'password': 'Minimum 16 characters, includes uppercase, lowercase, numbers, and special characters (!@#$%^&*).',
+				'postgres username': 'user_ followed by 12 random alphanumeric characters.',
+				'postgres password': 'Minimum 16 characters, includes only alphanumeric characters.',
+				'postgres db name': 'db_ followed by 12 random lowercase alphanumeric characters.',
+				'jwtsecret 32 hex': 'A 32-character random hex string (0-9, a-f).',
+				'jwtsecret 32 base64': 'A 32-character random, URL-safe base64 string.',
+				'ANON_KEY': 'A long, base64 string, similar in format to a JWT.',
+				'SECRET_KEY_BASE': 'A 128-character random hex string.',
+				'SERVICE_ROLE_KEY': 'A long, base64 string, similar in format to a JWT.'
+			};
+			
 			// Utility functions for generating random strings
 			function generateRandomString(length, charset) {
 				let result = '';
@@ -130,7 +144,7 @@ export const prerender = true;
 			}
 			
 			function generatePostgresUsername() {
-				return 'user_' + generateRandomString(12, ALPHANUMERIC_ONLY);
+				return `user_${generateRandomString(12, ALPHANUMERIC_ONLY)}`;
 			}
 			
 			function generatePostgresPassword() {
@@ -138,7 +152,7 @@ export const prerender = true;
 			}
 			
 			function generatePostgresDbName() {
-				return 'db_' + generateRandomString(12, ALPHANUMERIC_LOWER);
+				return `db_${generateRandomString(12, ALPHANUMERIC_LOWER)}`;
 			}
 			
 			function generateJwtSecretHex() {
@@ -191,53 +205,147 @@ export const prerender = true;
 				};
 			}
 			
-			// Function to render secrets in the UI
+			// Function to render secrets in the UI with tooltips
 			function renderSecrets(secrets) {
 				const container = document.getElementById('secrets-container');
 				let html = '<div class="space-y-3">';
 				
 				for (const [label, value] of Object.entries(secrets)) {
+					const explanation = SECRET_EXPLANATIONS[label] || 'No explanation available.';
+					const safeLabel = label.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+					
 					html += `
-						<div class="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-base-200 rounded-btn">
-							<span class="font-medium truncate">${label}:</span>
+						<div class="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-base-200 rounded-btn relative group">
+							<div class="flex items-center gap-2">
+								<span class="font-medium truncate">${label}:</span>
+								<button 
+									class="btn btn-xs btn-circle btn-ghost tooltip-trigger" 
+									aria-label="Show explanation for ${label}"
+									data-tooltip="${explanation}"
+									data-label="${safeLabel}"
+								>
+									?
+								</button>
+							</div>
 							<span class="font-mono text-sm break-all flex-1">${value}</span>
+							<div 
+								id="tooltip-${safeLabel}"
+								class="tooltip-content hidden absolute left-0 top-full mt-2 z-10 w-64 p-3 bg-base-100 border border-base-300 rounded-btn shadow-lg text-sm"
+								role="tooltip"
+							>
+								${explanation}
+							</div>
 						</div>
 					`;
 				}
 				
 				html += '</div>';
 				container.innerHTML = html;
+				
+				// Add event listeners for tooltips
+				setupTooltipListeners();
+			}
+			
+			// Function to set up tooltip event listeners
+			function setupTooltipListeners() {
+				const tooltipTriggers = document.querySelectorAll('.tooltip-trigger');
+				
+				tooltipTriggers.forEach(trigger => {
+					const label = trigger.getAttribute('data-label');
+					const tooltip = document.getElementById(`tooltip-${label}`);
+					
+					// Show tooltip on click
+					trigger.addEventListener('click', (e) => {
+						e.stopPropagation();
+						// Hide all other tooltips first
+						hideAllTooltips();
+						// Show this tooltip
+						showTooltip(tooltip);
+					});
+					
+					// Hide tooltip when pressing Escape
+					trigger.addEventListener('keydown', (e) => {
+						if (e.key === 'Escape') {
+							hideTooltip(tooltip);
+							trigger.blur();
+						}
+					});
+				});
+				
+				// Hide tooltips when clicking outside
+				document.addEventListener('click', (e) => {
+					if (!e.target.closest('.tooltip-trigger') && !e.target.closest('.tooltip-content')) {
+						hideAllTooltips();
+					}
+				});
+			}
+			
+			// Tooltip helper functions
+			function showTooltip(tooltip) {
+				if (tooltip) {
+					tooltip.classList.remove('hidden');
+				}
+			}
+			
+			function hideTooltip(tooltip) {
+				if (tooltip) {
+					tooltip.classList.add('hidden');
+				}
+			}
+			
+			function toggleTooltip(tooltip) {
+				if (tooltip) {
+					tooltip.classList.toggle('hidden');
+				}
+			}
+			
+			function hideAllTooltips() {
+				const tooltips = document.querySelectorAll('.tooltip-content');
+				tooltips.forEach(tooltip => tooltip.classList.add('hidden'));
 			}
 			
 			// Function to show error messages
 			function showError(message) {
 				const errorElement = document.getElementById('error-message');
 				const errorText = document.getElementById('error-text');
-				errorText.textContent = message;
-				errorElement.classList.remove('hidden');
-				
-				// Hide error after 5 seconds
-				setTimeout(() => {
-					errorElement.classList.add('hidden');
-				}, 5000);
+				if (errorText) {
+					errorText.textContent = message;
+				}
+				if (errorElement) {
+					errorElement.classList.remove('hidden');
+					
+					// Hide error after 5 seconds
+					setTimeout(() => {
+						if (errorElement) {
+							errorElement.classList.add('hidden');
+						}
+					}, 5000);
+				}
 			}
 			
 			// Function to show copy confirmation
 			function showCopyConfirmation() {
 				const confirmation = document.getElementById('copy-confirmation');
-				confirmation.classList.remove('hidden');
-				
-				// Hide confirmation after 2 seconds
-				setTimeout(() => {
-					confirmation.classList.add('hidden');
-				}, 2000);
+				if (confirmation) {
+					confirmation.classList.remove('hidden');
+					
+					// Hide confirmation after 2 seconds
+					setTimeout(() => {
+						if (confirmation) {
+							confirmation.classList.add('hidden');
+						}
+					}, 2000);
+				}
 			}
 			
 			// Generate secrets when button is clicked
 			document.getElementById('generate-btn').addEventListener('click', () => {
 				try {
 					// Hide any previous error messages
-					document.getElementById('error-message').classList.add('hidden');
+					const errorMessage = document.getElementById('error-message');
+					if (errorMessage) {
+						errorMessage.classList.add('hidden');
+					}
 					
 					// Generate all secrets
 					const secrets = generateAllSecrets();
@@ -253,7 +361,10 @@ export const prerender = true;
 			document.getElementById('copy-btn').addEventListener('click', () => {
 				try {
 					// Hide any previous error messages
-					document.getElementById('error-message').classList.add('hidden');
+					const errorMessage = document.getElementById('error-message');
+					if (errorMessage) {
+						errorMessage.classList.add('hidden');
+					}
 					
 					// Get all secret elements
 					const secretElements = document.querySelectorAll('#secrets-container .flex');
@@ -265,9 +376,13 @@ export const prerender = true;
 					// Format secrets for .env file
 					let envContent = '';
 					secretElements.forEach(element => {
-						const label = element.querySelector('span.font-medium').textContent.replace(':', '');
-						const value = element.querySelector('span.font-mono').textContent;
-						envContent += `${label}=${value}\n`;
+						const labelElement = element.querySelector('span.font-medium');
+						const valueElement = element.querySelector('span.font-mono');
+						if (labelElement && valueElement) {
+							const label = labelElement.textContent.replace(':', '');
+							const value = valueElement.textContent;
+							envContent += `${label}=${value}\n`;
+						}
 					});
 					
 					// Copy to clipboard
@@ -276,7 +391,26 @@ export const prerender = true;
 							showCopyConfirmation();
 						})
 						.catch(err => {
-							showError('Failed to copy to clipboard: ' + err.message);
+							// Fallback for browsers that don't support clipboard API
+							try {
+								const textArea = document.createElement('textarea');
+								textArea.value = envContent;
+								textArea.style.position = 'fixed';
+								textArea.style.left = '-999999px';
+								textArea.style.top = '-999999px';
+								document.body.appendChild(textArea);
+								textArea.focus();
+								textArea.select();
+								const successful = document.execCommand('copy');
+								document.body.removeChild(textArea);
+								if (successful) {
+									showCopyConfirmation();
+								} else {
+									showError('Failed to copy to clipboard using fallback method');
+								}
+							} catch (fallbackError) {
+								showError('Failed to copy to clipboard: ' + (err.message || fallbackError.message));
+							}
 						});
 				} catch (error) {
 					showError('Failed to copy secrets: ' + error.message);

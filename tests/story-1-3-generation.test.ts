@@ -45,14 +45,14 @@ test.describe("Story 1.3: Secret Generation Logic", () => {
     // Check username format (8-12 alphanumeric characters)
     const usernameRow = page
       .getByText("username:", { exact: true })
-      .locator("..");
+      .locator("../.."); // Go up two levels to get the correct parent
     const usernameValue = await usernameRow.locator(".font-mono").textContent();
     expect(usernameValue).toMatch(/^[a-zA-Z0-9]{8,12}$/);
 
     // Check password format (16 characters with required types)
     const passwordRow = page
       .getByText("password:", { exact: true })
-      .locator("..");
+      .locator("../.."); // Go up two levels to get the correct parent
     const passwordValue = await passwordRow.locator(".font-mono").textContent();
     expect(passwordValue).toHaveLength(16);
     expect(passwordValue).toMatch(/[A-Z]/); // uppercase
@@ -63,7 +63,7 @@ test.describe("Story 1.3: Secret Generation Logic", () => {
     // Check postgres username format (user_ + 12 alphanumeric)
     const pgUsernameRow = page
       .getByText("postgres username:", { exact: true })
-      .locator("..");
+      .locator("../.."); // Go up two levels to get the correct parent
     const pgUsernameValue = await pgUsernameRow
       .locator(".font-mono")
       .textContent();
@@ -72,7 +72,7 @@ test.describe("Story 1.3: Secret Generation Logic", () => {
     // Check postgres password format (16 alphanumeric)
     const pgPasswordRow = page
       .getByText("postgres password:", { exact: true })
-      .locator("..");
+      .locator("../.."); // Go up two levels to get the correct parent
     const pgPasswordValue = await pgPasswordRow
       .locator(".font-mono")
       .textContent();
@@ -81,21 +81,21 @@ test.describe("Story 1.3: Secret Generation Logic", () => {
     // Check postgres db name format (db_ + 12 lowercase alphanumeric)
     const pgDbNameRow = page
       .getByText("postgres db name:", { exact: true })
-      .locator("..");
+      .locator("../.."); // Go up two levels to get the correct parent
     const pgDbNameValue = await pgDbNameRow.locator(".font-mono").textContent();
     expect(pgDbNameValue).toMatch(/^db_[a-z0-9]{12}$/);
 
     // Check jwtsecret 32 hex format (32 hex characters)
     const jwtHexRow = page
       .getByText("jwtsecret 32 hex:", { exact: true })
-      .locator("..");
+      .locator("../.."); // Go up two levels to get the correct parent
     const jwtHexValue = await jwtHexRow.locator(".font-mono").textContent();
     expect(jwtHexValue).toMatch(/^[0-9a-f]{32}$/);
 
     // Check SECRET_KEY_BASE format (128 hex characters)
     const secretKeyBaseRow = page
       .getByText("SECRET_KEY_BASE:", { exact: true })
-      .locator("..");
+      .locator("../.."); // Go up two levels to get the correct parent
     const secretKeyBaseValue = await secretKeyBaseRow
       .locator(".font-mono")
       .textContent();
@@ -140,7 +140,7 @@ test.describe("Story 1.3: Secret Generation Logic", () => {
     await expect(page.getByText("username:", { exact: true })).toBeVisible();
     const firstPasswordRow = page
       .getByText("password:", { exact: true })
-      .locator("..");
+      .locator("../.."); // Go up two levels to get the correct parent
     const firstPassword = await firstPasswordRow
       .locator(".font-mono")
       .textContent();
@@ -152,7 +152,7 @@ test.describe("Story 1.3: Secret Generation Logic", () => {
     await expect(page.getByText("username:", { exact: true })).toBeVisible();
     const secondPasswordRow = page
       .getByText("password:", { exact: true })
-      .locator("..");
+      .locator("../.."); // Go up two levels to get the correct parent
     const secondPassword = await secondPasswordRow
       .locator(".font-mono")
       .textContent();

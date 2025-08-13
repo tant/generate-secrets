@@ -1,3 +1,34 @@
+# Playwright reports
+playwright-report/
+
+# VS Code settings
+.vscode/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# IDE folders
+.idea/
+.history/
+.vscode/
+
+# Test coverage
+coverage/
+*.lcov
+
+# Misc
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.orig
+*.rej
+# Playwright reports
+playwright-report/
 # build output
 dist/
 # generated types
