@@ -15,5 +15,6 @@
 ## Additional Technical Assumptions and Requests
 * **Language:** TypeScript.
 * **Framework:** Astro.
+* **UI Component & Icon Library:** daisyUI (for all UI components and icons, fully integrated with Tailwind CSS v4, no separate icon library needed).
 * **Build Tool:** Astro (uses Vite internally).
 * **Hosting:** Vercel.

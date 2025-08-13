@@ -16,7 +16,7 @@ There is only one single screen. There are no other pages or views. This screen 
 * **Goal:** WCAG AA. Ensure good color contrast, full keyboard usability, and screen reader-accessible tooltips.
 
 ## Branding
-* **Requirements:** No specific requirements. The interface will be clean, modern, and use a simple, readable color palette (e.g., a dark theme with light text to reduce eye strain).
+* **Requirements:** The interface uses daisyUI for all UI components and icons, ensuring a clean, modern, and consistent look. Theme is easily customizable (default: cyberpunk). Color palette and accessibility are handled by daisyUI presets.
 
 ## Target Device and Platforms
 * **Goal:** Web Responsive. The interface must display well on all screen sizes, from mobile phones to desktops.

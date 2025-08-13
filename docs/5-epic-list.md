@@ -31,8 +31,8 @@
 2. React integration is configured in the Astro project according to official documentation.
 3. TypeScript is configured in the project.
 4. TailwindCSS is installed and configured for the project.
-5. A modern UI component library (e.g., shadcn/ui, Radix UI, or similar) is selected, installed, and documented in the README.
-6. An icon library (e.g., Lucide, Heroicons, or similar) is selected, installed, and documented in the README.
+5. daisyUI is selected, installed, and documented as the modern UI component library for the project (replacing shadcn/ui, Radix UI, etc.).
+6. daisyUI is also used as the icon library for the project (replacing Lucide, Heroicons, etc.), and is documented in the README.
 7. Prettier and ESLint are configured for code style and quality.
 8. The README includes setup, usage, and documentation for all libraries used.
 9. The project is pushed to a Git repository (e.g., GitHub).

@@ -6,7 +6,7 @@
 * **FR3:** The system must provide a single action (clicking "Copy") to copy all generated values to the user's clipboard.
 * **FR4:** The system must display an explanation (tooltip/pop-up) about a label's properties when a user interacts with the `?` icon next to it.
 
-* **FR5:** The user interface must be accessible (tab navigation, aria-labels for buttons, keyboard navigation for tooltips, etc.).
+* **FR5:** The user interface must be accessible (tab navigation, aria-labels for buttons, keyboard navigation for tooltips, etc.), and is built entirely with daisyUI (for both UI components and icons).
 * **FR6:** The main page must include essential SEO metadata (title, description, Open Graph tags, etc.).
 * **FR7:** Analytics (e.g., Google Analytics, Plausible, etc.) should be integrated to track basic usage (if required by the product owner).
 * **FR8:** There must be a manual test checklist and automated test coverage for core features.
