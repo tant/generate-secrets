@@ -6,7 +6,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.3",
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.1.4",
+    "@playwright/test": "^1.54.2",
     "daisyui": "^5.0.50"
   }
 }
