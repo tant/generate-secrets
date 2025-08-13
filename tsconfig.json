@@ -8,11 +8,12 @@
     "dist"
   ],
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
-    "strict": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "skipLibCheck": true
+  "jsx": "react-jsx",
+  "jsxImportSource": "react",
+  "strict": true,
+  "esModuleInterop": true,
+  "moduleResolution": "nodenext",
+  "module": "NodeNext",
+  "skipLibCheck": true
   }
 }
