@@ -53,7 +53,7 @@
 7. Essential SEO metadata (title, description, Open Graph tags, etc.) is completed for the main page.
 8. The UI is accessible (tab navigation, aria-labels for buttons, etc.).
 9. UI is tested on Chrome, Firefox, and Safari.
-10. Wireframe or mockup is provided (link to Figma or image).
+// (Removed: Wireframe or mockup requirement)
 11. User-friendly error messages are displayed for any UI or browser API failures (e.g., clipboard not supported).
 
 ### Story 1.3: Implement Secret Generation Logic
