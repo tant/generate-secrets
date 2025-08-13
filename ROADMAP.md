@@ -54,6 +54,7 @@ Tracking
 
 Goal
 - Support importing and generating secrets for Supabase projects via the official `.env.example` file, with drag-and-drop or GitHub URL input.
+- https://github.com/supabase/supabase/blob/master/docker/.env.example
 
 Description
 - Allow users to import Supabase's `.env.example` (drag & drop or paste GitHub URL).
