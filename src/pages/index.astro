@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import Analytics from '@vercel/analytics/astro'
+import Analytics from '@vercel/analytics/astro';
 
 // SEO metadata
 export const prerender = true;
@@ -29,6 +29,7 @@ export const prerender = true;
 		<meta property="twitter:image" content={`${Astro.site?.origin || 'https://generate-secrets.tantran.dev'}/preview.png`} />
 		
 		<title>Generate Secrets - Instant Secure Credential Generator</title>
+		<Analytics />
 	</head>
 	<body class="min-h-screen bg-base-200">
 		<main class="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-screen">
