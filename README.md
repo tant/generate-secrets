@@ -1,6 +1,10 @@
 
 # Generate Secrets
 
+[![GitHub](https://img.shields.io/badge/github-tant%2Fgenerate--secrets-blue?logo=github)](https://github.com/tant/generate-secrets)
+
+**Repository:** https://github.com/tant/generate-secrets
+
 A blazing fast, minimalist, and privacy-first web tool to instantly generate secure credentials for developers. Built with Astro, React, Tailwind CSS v4, and daisyUI.
 
 ---
