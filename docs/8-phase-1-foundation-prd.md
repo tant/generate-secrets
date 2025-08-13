@@ -177,3 +177,78 @@ Acceptance
 - Roadmap: ROADMAP.md (Phase 1 section)
 - Architecture: docs/9-template-architecture-and-roadmap.md
 - Wireframes baseline: docs/8-supabase-env-import.md (shared panels styling)
+
+---
+
+## Implementation notes (Phase 1 skeleton)
+
+### Proposed file structure
+
+```
+src/
+  templates/
+    registry.ts         # TemplateRegistry and helpers
+  components/
+    shared/
+      ImportPanel.astro
+      SummaryControls.astro
+      ParsedList.astro
+      PreviewPanel.astro
+  pages/
+    templates/
+      [id].astro        # Dynamic route for template pages
+```
+
+### Stub interfaces (TypeScript)
+
+// src/templates/registry.ts
+export interface TemplateMeta {
+  id: string;
+  title: string;
+  description: string;
+  version: string;
+  keywords: string[];
+  match?: (content: string) => boolean | number;
+  urlNormalizer?: (url: string) => string | Error;
+  knownKeys: Array<{
+    key: string;
+    label: string;
+    tooltip?: string;
+    mask?: boolean;
+  }>;
+  uiOptions?: {
+    showUrlInput?: boolean;
+    showPreserveToggle?: boolean;
+    showJwtTtlControl?: boolean;
+  };
+}
+
+export const templates: Record<string, TemplateMeta> = {
+  supabase: {
+    id: "supabase",
+    title: "Supabase .env",
+    description: "Generate secure secrets for Supabase self-hosting.",
+    version: "1.0.0",
+    keywords: ["supabase", "postgres", "jwt"],
+    urlNormalizer: (url) => url.replace(
+      /^https:\/\/github.com\/(.+?)\/(.+?)\/blob\/(.+?)\/(.+)$/, 
+      "https://raw.githubusercontent.com/$1/$2/$3/$4"
+    ),
+    knownKeys: [
+      { key: "POSTGRES_PASSWORD", label: "Postgres Password", mask: true },
+      // ...more keys
+    ],
+    uiOptions: {
+      showUrlInput: true,
+      showPreserveToggle: true,
+      showJwtTtlControl: true,
+    }
+  },
+  // ...other templates
+};
+
+export function getTemplateById(id: string): TemplateMeta | undefined {
+  return templates[id];
+}
+
+// Usage: getTemplateById(params.id) in [id].astro
