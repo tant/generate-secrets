@@ -41,12 +41,14 @@ export const prerender = true;
 				<!-- Action Buttons -->
 				<div class="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
 					<button 
+						id="generate-btn"
 						class="btn btn-primary flex-1"
 						aria-label="Generate new secrets"
 					>
 						Generate
 					</button>
 					<button 
+						id="copy-btn"
 						class="btn btn-secondary flex-1"
 						aria-label="Copy all secrets to clipboard"
 					>
@@ -54,21 +56,232 @@ export const prerender = true;
 					</button>
 				</div>
 				
-				<!-- Secrets List Placeholder -->
+				<!-- Copy Confirmation Message -->
+				<div id="copy-confirmation" class="alert alert-success hidden mb-4">
+					<span>Copied to clipboard!</span>
+				</div>
+				
+				<!-- Secrets List -->
 				<div class="space-y-4">
 					<h2 class="text-xl font-semibold mb-4">Generated Secrets</h2>
-					<div class="bg-base-200 rounded-box p-6 text-center">
-						<p class="text-base-content/70">Click "Generate" to create your secure credentials</p>
+					<div id="secrets-container">
+						<div class="bg-base-200 rounded-box p-6 text-center">
+							<p class="text-base-content/70">Click "Generate" to create your secure credentials</p>
+						</div>
 					</div>
 				</div>
 				
-				<!-- Error Message Placeholder -->
-				<div class="mt-6 hidden" role="alert" aria-live="polite">
+				<!-- Error Message -->
+				<div id="error-message" class="mt-6 hidden" role="alert" aria-live="polite">
 					<div class="alert alert-error">
-						<span>Error: Clipboard not supported in your browser</span>
+						<span id="error-text">Error: Something went wrong</span>
 					</div>
 				</div>
 			</div>
 		</main>
+		
+		<!-- Client-side script for interactivity -->
+		<script>
+			// Character sets for generating secrets
+			const LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
+			const UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+			const NUMBERS = '0123456789';
+			const SPECIAL_CHARS = '!@#$%^&*';
+			const ALPHANUMERIC = LOWERCASE + UPPERCASE + NUMBERS;
+			const HEX_CHARS = '0123456789abcdef';
+			const ALPHANUMERIC_LOWER = LOWERCASE + NUMBERS;
+			const ALPHANUMERIC_ONLY = LOWERCASE + UPPERCASE + NUMBERS;
+			
+			// Utility functions for generating random strings
+			function generateRandomString(length, charset) {
+				let result = '';
+				const charsetLength = charset.length;
+				
+				for (let i = 0; i < length; i++) {
+					const randomIndex = Math.floor(Math.random() * charsetLength);
+					result += charset[randomIndex];
+				}
+				
+				return result;
+			}
+			
+			// Secret generation functions
+			function generateUsername() {
+				const length = Math.floor(Math.random() * 5) + 8; // 8-12 characters
+				return generateRandomString(length, ALPHANUMERIC_ONLY);
+			}
+			
+			function generatePassword() {
+				const length = 16;
+				const allChars = ALPHANUMERIC + SPECIAL_CHARS;
+				
+				// Ensure at least one character from each required set
+				let password = '';
+				password += generateRandomString(1, UPPERCASE);
+				password += generateRandomString(1, LOWERCASE);
+				password += generateRandomString(1, NUMBERS);
+				password += generateRandomString(1, SPECIAL_CHARS);
+				
+				// Fill the rest randomly
+				password += generateRandomString(length - 4, allChars);
+				
+				// Shuffle the password to avoid predictable patterns
+				return password.split('').sort(() => Math.random() - 0.5).join('');
+			}
+			
+			function generatePostgresUsername() {
+				return 'user_' + generateRandomString(12, ALPHANUMERIC_ONLY);
+			}
+			
+			function generatePostgresPassword() {
+				return generateRandomString(16, ALPHANUMERIC_ONLY);
+			}
+			
+			function generatePostgresDbName() {
+				return 'db_' + generateRandomString(12, ALPHANUMERIC_LOWER);
+			}
+			
+			function generateJwtSecretHex() {
+				return generateRandomString(32, HEX_CHARS);
+			}
+			
+			function generateJwtSecretBase64() {
+				// Generate 32 random bytes and encode as base64
+				const array = new Uint8Array(32);
+				for (let i = 0; i < 32; i++) {
+					array[i] = Math.floor(Math.random() * 256);
+				}
+				return btoa(String.fromCharCode(...array));
+			}
+			
+			function generateAnonKey() {
+				// Generate a longer base64 string similar to a JWT
+				const array = new Uint8Array(48); // 48 bytes = 64 base64 chars
+				for (let i = 0; i < 48; i++) {
+					array[i] = Math.floor(Math.random() * 256);
+				}
+				return btoa(String.fromCharCode(...array));
+			}
+			
+			function generateSecretKeyBase() {
+				return generateRandomString(128, HEX_CHARS);
+			}
+			
+			function generateServiceRoleKey() {
+				// Generate a longer base64 string similar to a JWT
+				const array = new Uint8Array(48); // 48 bytes = 64 base64 chars
+				for (let i = 0; i < 48; i++) {
+					array[i] = Math.floor(Math.random() * 256);
+				}
+				return btoa(String.fromCharCode(...array));
+			}
+			
+			function generateAllSecrets() {
+				return {
+					'username': generateUsername(),
+					'password': generatePassword(),
+					'postgres username': generatePostgresUsername(),
+					'postgres password': generatePostgresPassword(),
+					'postgres db name': generatePostgresDbName(),
+					'jwtsecret 32 hex': generateJwtSecretHex(),
+					'jwtsecret 32 base64': generateJwtSecretBase64(),
+					'ANON_KEY': generateAnonKey(),
+					'SECRET_KEY_BASE': generateSecretKeyBase(),
+					'SERVICE_ROLE_KEY': generateServiceRoleKey()
+				};
+			}
+			
+			// Function to render secrets in the UI
+			function renderSecrets(secrets) {
+				const container = document.getElementById('secrets-container');
+				let html = '<div class="space-y-3">';
+				
+				for (const [label, value] of Object.entries(secrets)) {
+					html += `
+						<div class="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-base-200 rounded-btn">
+							<span class="font-medium truncate">${label}:</span>
+							<span class="font-mono text-sm break-all flex-1">${value}</span>
+						</div>
+					`;
+				}
+				
+				html += '</div>';
+				container.innerHTML = html;
+			}
+			
+			// Function to show error messages
+			function showError(message) {
+				const errorElement = document.getElementById('error-message');
+				const errorText = document.getElementById('error-text');
+				errorText.textContent = message;
+				errorElement.classList.remove('hidden');
+				
+				// Hide error after 5 seconds
+				setTimeout(() => {
+					errorElement.classList.add('hidden');
+				}, 5000);
+			}
+			
+			// Function to show copy confirmation
+			function showCopyConfirmation() {
+				const confirmation = document.getElementById('copy-confirmation');
+				confirmation.classList.remove('hidden');
+				
+				// Hide confirmation after 2 seconds
+				setTimeout(() => {
+					confirmation.classList.add('hidden');
+				}, 2000);
+			}
+			
+			// Generate secrets when button is clicked
+			document.getElementById('generate-btn').addEventListener('click', () => {
+				try {
+					// Hide any previous error messages
+					document.getElementById('error-message').classList.add('hidden');
+					
+					// Generate all secrets
+					const secrets = generateAllSecrets();
+					
+					// Render secrets in the UI
+					renderSecrets(secrets);
+				} catch (error) {
+					showError('Failed to generate secrets: ' + error.message);
+				}
+			});
+			
+			// Copy secrets to clipboard when button is clicked
+			document.getElementById('copy-btn').addEventListener('click', () => {
+				try {
+					// Hide any previous error messages
+					document.getElementById('error-message').classList.add('hidden');
+					
+					// Get all secret elements
+					const secretElements = document.querySelectorAll('#secrets-container .flex');
+					if (secretElements.length === 0) {
+						showError('No secrets to copy. Please generate secrets first.');
+						return;
+					}
+					
+					// Format secrets for .env file
+					let envContent = '';
+					secretElements.forEach(element => {
+						const label = element.querySelector('span.font-medium').textContent.replace(':', '');
+						const value = element.querySelector('span.font-mono').textContent;
+						envContent += `${label}=${value}\n`;
+					});
+					
+					// Copy to clipboard
+					navigator.clipboard.writeText(envContent)
+						.then(() => {
+							showCopyConfirmation();
+						})
+						.catch(err => {
+							showError('Failed to copy to clipboard: ' + err.message);
+						});
+				} catch (error) {
+					showError('Failed to copy secrets: ' + error.message);
+				}
+			});
+		</script>
 	</body>
 </html>
