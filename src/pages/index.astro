@@ -82,16 +82,6 @@ export const prerender = true;
 		
 		<!-- Client-side script for interactivity -->
 		<script>
-			// Character sets for generating secrets
-			const LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
-			const UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-			const NUMBERS = '0123456789';
-			const SPECIAL_CHARS = '!@#$%^&*';
-			const ALPHANUMERIC = LOWERCASE + UPPERCASE + NUMBERS;
-			const HEX_CHARS = '0123456789abcdef';
-			const ALPHANUMERIC_LOWER = LOWERCASE + NUMBERS;
-			const ALPHANUMERIC_ONLY = LOWERCASE + UPPERCASE + NUMBERS;
-			
 			// Tooltip explanations for each secret type
 			const SECRET_EXPLANATIONS = {
 				'username': 'Random, readable string, 8-12 characters, no special characters.',
@@ -105,6 +95,16 @@ export const prerender = true;
 				'SECRET_KEY_BASE': 'A 128-character random hex string.',
 				'SERVICE_ROLE_KEY': 'A long, base64 string, similar in format to a JWT.'
 			};
+			
+			// Character sets for generating secrets
+			const LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
+			const UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+			const NUMBERS = '0123456789';
+			const SPECIAL_CHARS = '!@#$%^&*';
+			const ALPHANUMERIC = LOWERCASE + UPPERCASE + NUMBERS;
+			const HEX_CHARS = '0123456789abcdef';
+			const ALPHANUMERIC_LOWER = LOWERCASE + NUMBERS;
+			const ALPHANUMERIC_ONLY = LOWERCASE + UPPERCASE + NUMBERS;
 			
 			// Utility functions for generating random strings
 			function generateRandomString(length, charset) {
@@ -290,12 +290,6 @@ export const prerender = true;
 			function hideTooltip(tooltip) {
 				if (tooltip) {
 					tooltip.classList.add('hidden');
-				}
-			}
-			
-			function toggleTooltip(tooltip) {
-				if (tooltip) {
-					tooltip.classList.toggle('hidden');
 				}
 			}
 			
