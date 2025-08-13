@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import Analytics from '@vercel/analytics/astro'
 
 // SEO metadata
 export const prerender = true;
@@ -15,17 +16,17 @@ export const prerender = true;
 		
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="website" />
-		<meta property="og:url" content="https://generate-secrets.vercel.app/" />
+		<meta property="og:url" content={Astro.site?.href || 'https://generate-secrets.tantran.dev/'} />
 		<meta property="og:title" content="Generate Secrets - Instant Secure Credential Generator" />
 		<meta property="og:description" content="A blazing fast, minimalist, and privacy-first web tool to instantly generate secure credentials for developers." />
-		<meta property="og:image" content="https://generate-secrets.vercel.app/preview.png" />
-		
+		<meta property="og:image" content={`${Astro.site?.origin || 'https://generate-secrets.tantran.dev'}/preview.png`} />
+
 		<!-- Twitter -->
 		<meta property="twitter:card" content="summary_large_image" />
-		<meta property="twitter:url" content="https://generate-secrets.vercel.app/" />
+		<meta property="twitter:url" content={Astro.site?.href || 'https://generate-secrets.tantran.dev/'} />
 		<meta property="twitter:title" content="Generate Secrets - Instant Secure Credential Generator" />
 		<meta property="twitter:description" content="A blazing fast, minimalist, and privacy-first web tool to instantly generate secure credentials for developers." />
-		<meta property="twitter:image" content="https://generate-secrets.vercel.app/preview.png" />
+		<meta property="twitter:image" content={`${Astro.site?.origin || 'https://generate-secrets.tantran.dev'}/preview.png`} />
 		
 		<title>Generate Secrets - Instant Secure Credential Generator</title>
 	</head>
@@ -411,5 +412,6 @@ export const prerender = true;
 				}
 			});
 		</script>
+		 <Analytics />
 	</body>
 </html>
